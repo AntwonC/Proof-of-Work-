@@ -1,0 +1,161 @@
+#!/usr/bin/python3
+import hashlib
+import sys
+import os
+
+
+initHash = ""
+f = open(sys.argv[1], 'r')
+
+if os.stat(sys.argv[1]).st_size == 0: 
+    print("output.txt is empty")
+    sys.exit()
+
+lines = f.readlines() 
+
+initHash = lines[1] #Read in initial Hash
+
+d = ""
+for w in lines: 
+    initHash = w
+    for x in initHash: 
+        if x == ":":
+            break
+        else: 
+            d += x
+    if d == "Initial-hash":
+        break
+    else: 
+        d = ""
+
+h = ""
+for x in initHash: 
+    if x == ":":
+        h = ""
+        
+    else: 
+        h += x
+
+
+
+
+#print(initHash)
+#print(h.strip())
+with open(sys.argv[2], 'r') as file: 
+    textFile = file.read() #Stored file as string 
+#print(textFile)
+hh = hashlib.sha256(textFile.encode('utf-8')).hexdigest() #Openssl command with string
+#Test 1 
+if h.strip() == hh: 
+    print("Passed")
+else: 
+    print("Test 1 Failed")
+
+#Test 2
+        
+#c = lines[2] # Read in the proof of work 
+c = "" 
+d = ""
+for w in lines: 
+    c = w
+    for x in c: 
+        if x == ":":
+            break
+        else: 
+            d += x
+    if d == "Proof-of-work":
+        break
+    else: 
+        d = ""
+#print(d)
+
+#a = lines[3] # Read in the hash
+a = "" 
+d = ""
+for w in lines: 
+    a = w
+    for x in a: 
+        if x == ":":
+            break
+        else: 
+            d += x
+    if d == "Hash":
+        break
+    else: 
+        d = ""
+
+proof = "" 
+ans = ""
+
+for x in c: 
+    if x == ":": 
+        proof = "" 
+    else: 
+        proof += x
+
+for x in a: 
+    if x == ":":
+        ans = ""
+    else: 
+        ans += x
+
+proof = proof.strip()
+ans = ans.strip() 
+
+#print(proof + hh)
+
+p = proof + hh
+
+finalHash = hashlib.sha256(p.encode('utf-8')).hexdigest() 
+
+if finalHash == ans: 
+    print("Passed")
+else: 
+    print("Test 2 Failed")
+    sys.exit()
+
+#Test 3
+#l = lines[4]
+
+d = ""
+l = ""
+for w in lines: 
+    l = w
+    for x in l: 
+        if x == ":":
+            break
+        else: 
+            d += x
+    if d == "Leading-bits":
+        break
+    else: 
+        d = ""
+count = 0 
+leading = ""
+
+for x in l: 
+    if x == ":":
+        leading = ""
+    else: 
+        leading += x
+
+scale = 16 
+num_of_bits = len(finalHash) * 4
+     
+bits = bin(int(finalHash, scale))[2:].zfill(num_of_bits)
+
+leading = leading.strip() 
+
+check = False
+for x in bits: 
+    if x == '0': 
+        count += 1
+    else: 
+        if count == int(leading):
+            print("Passed")
+            check = True
+            break
+
+if check == False: 
+    print("Test 3 Failed")
+
